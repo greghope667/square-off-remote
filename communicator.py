@@ -14,6 +14,7 @@ class Communicator:
         self._rx_queue = asyncio.Queue()
         self._debug = debug
         self._loop = None
+        self._keep_running = False
 
     async def _handle_rx(self, _: BleakGATTCharacteristic, data: bytearray):
         rx = data.decode("ascii").strip()
@@ -28,6 +29,9 @@ class Communicator:
 
     async def run(self):
         self._loop = asyncio.get_running_loop()
+        self._keep_running = True
+
+        print("Searching for device...")
         self._device = await BleakScanner.find_device_by_name("Square Off")
 
         if self._device is None:
@@ -43,15 +47,20 @@ class Communicator:
             nus = client.services.get_service(Communicator.UART_SERVICE_UUID)
             rx_char = nus.get_characteristic(Communicator.UART_RX_CHAR_UUID)
 
-            while True:
+            while self._keep_running:
                 tx: bytes = await self._tx_queue.get()
                 if self._debug:
                     print("Transmit: ", tx)
                 await client.write_gatt_char(rx_char, tx)
+                await asyncio.sleep(0.1)
+
+    def stop(self):
+        self._keep_running = False
 
     def transmit(self, tx: str):
-        if self._loop is None:
-            return
+        while self._loop is None:
+            pass
+
         txb = tx.strip().encode("ascii")
 
         assert(len(txb) <= 16) # max packet size
