@@ -1,0 +1,13 @@
+#JSGF V1.0;
+
+grammar chess;
+
+<rank> = one | two | three | four | five | six | seven | eight;
+<file> = alpha | bravo | charlie | delta | echo | foxtrot | golf | hotel;
+<square> = <file> <rank>;
+<piece> = pawn | knight | bishop | rook | queen | king;
+
+<capture> = ( take | capture ) [ <piece> ];
+<promote> = promote <piece>;
+
+public <move> = ( <square> | <piece> ) [ <capture> ] <square> [ promote ];

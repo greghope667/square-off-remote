@@ -1,10 +1,12 @@
 from squareoff import SquareOff
 import player
 
+import time
+
 import chess
 
-white = player.random_player()
-black = player.stockfish_player()
+white = player.player_stockfish()
+black = player.player_random()
 
 try:
     so = SquareOff()
@@ -19,6 +21,7 @@ try:
         board.push(move)
         so.make_move(move)
         active, non_active = non_active, active
+        time.sleep(1)
 
     so.end_game()
 finally:
