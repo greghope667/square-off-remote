@@ -10,4 +10,4 @@ grammar chess;
 <capture> = ( take | capture ) [ <piece> ];
 <promote> = promote <piece>;
 
-public <move> = ( <square> | <piece> ) [ <capture> ] <square> [ promote ];
+public <move> = ( <square> | <piece> ) [ <capture> ] <square> [ <promote> ];

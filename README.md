@@ -5,6 +5,7 @@ This is my attempt at controlling a Grand Kingdom chess set from Square Off, dir
 ## Working:
 - Moves
 - AI vs AI games
+- Voice control
 
 ## Todo:
 - Human vs AI games
