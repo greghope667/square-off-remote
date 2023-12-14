@@ -1,4 +1,5 @@
 import asyncio
+import threading
 import sys
 
 from bleak import BleakClient, BleakScanner
@@ -14,7 +15,6 @@ class Communicator:
         self._rx_queue = asyncio.Queue()
         self._debug = debug
         self._loop = None
-        self._keep_running = False
 
     async def _handle_rx(self, _: BleakGATTCharacteristic, data: bytearray):
         rx = data.decode("ascii").strip()
@@ -22,14 +22,13 @@ class Communicator:
             print("Receive: ", rx)
         await self._rx_queue.put(rx)
 
-    async def _handle_disconnect(self, _: BleakClient):
+    def _handle_disconnect(self, _: BleakClient):
         print("Device was disconnected")
         for task in asyncio.all_tasks(self._loop):
             task.cancel()
 
-    async def run(self):
+    async def _run(self):
         self._loop = asyncio.get_running_loop()
-        self._keep_running = True
 
         print("Searching for device...")
         self._device = await BleakScanner.find_device_by_name("Square Off")
@@ -47,15 +46,27 @@ class Communicator:
             nus = client.services.get_service(Communicator.UART_SERVICE_UUID)
             rx_char = nus.get_characteristic(Communicator.UART_RX_CHAR_UUID)
 
-            while self._keep_running:
-                tx: bytes = await self._tx_queue.get()
+            while True:
+                tx: bytes|None = await self._tx_queue.get()
+                if tx is None:
+                    return
                 if self._debug:
                     print("Transmit: ", tx)
                 await client.write_gatt_char(rx_char, tx)
                 await asyncio.sleep(0.1)
 
+    def run(self):
+        def target():
+            try:
+                asyncio.run(self._run())
+            except asyncio.exceptions.CancelledError:
+                pass
+
+        threading.Thread(target=target).start()
+
     def stop(self):
-        self._keep_running = False
+        print("Disconnecting...")
+        asyncio.run_coroutine_threadsafe(self._tx_queue.put(None), self._loop).result()
 
     def transmit(self, tx: str):
         while self._loop is None:
@@ -80,6 +91,7 @@ def _main():
     import threading
 
     com = Communicator()
+    com.run()
 
     def stdin():
         while True:
@@ -91,8 +103,6 @@ def _main():
 
     threading.Thread(target = stdin, daemon = True).start()
     threading.Thread(target = stdout, daemon = True).start()
-
-    asyncio.run(com.run())
 
 if __name__ == "__main__":
     _main()

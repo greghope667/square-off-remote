@@ -1,7 +1,4 @@
-import asyncio
-import threading
 import time
-
 import chess
 
 import communicator
@@ -15,18 +12,8 @@ class SquareOff:
         print("Connected, battery = ", self.battery())
 
     def _start_comms(self):
-        def target():
-            try:
-                asyncio.run(self._board.run())
-            except asyncio.CancelledError:
-                pass
-
-        thread = threading.Thread(target = target)
-        thread.start()
-
-        time.sleep(1)
+        self._board.run()
         self._board.transmit("CONNECTED")
-        time.sleep(1)
 
     def make_move(self, move: chess.Move):
         self._board.transmit(move.uci()[:4])
@@ -44,7 +31,6 @@ class SquareOff:
 
     def disconnect(self):
         self._board.stop()
-        self._board.transmit("RSTVAR")
 
 
 def _main(move_count = 4):
