@@ -34,3 +34,18 @@ def player_voice() -> Player:
 
     return play
 
+def player_cli() -> Player:
+    def play(board: chess.Board) -> chess.Move:
+        while True:
+            text = input("Enter move: ").lower()
+            candidates = list(moveutils.candidates(board, text))
+            if len(candidates) == 1:
+                move = candidates[0]
+                print("Playing", move.uci())
+                return move
+            elif len(candidates) == 0:
+                print("Unknown/invalid move")
+            else:
+                print("Move ambiguous, candidates", candidates)
+
+    return play
