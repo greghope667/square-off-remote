@@ -11,8 +11,10 @@ Player: typing.TypeAlias = typing.Callable[[chess.Board], chess.Move]
 def player_random() -> Player:
     return lambda b: random.choice(list(b.generate_legal_moves()))
 
-def player_stockfish() -> Player:
+def player_stockfish(skill=None) -> Player:
     engine = chess.engine.SimpleEngine.popen_uci("stockfish")
+    if skill is not None:
+        engine.configure({"Skill Level": skill})
     return lambda b: engine.play(b, chess.engine.Limit(time=0.1)).move
 
 def player_voice() -> Player:
@@ -46,6 +48,6 @@ def player_cli() -> Player:
             elif len(candidates) == 0:
                 print("Unknown/invalid move")
             else:
-                print("Move ambiguous, candidates", candidates)
+                print("Move ambiguous, candidates", [moveutils.encode_precise(board, m) for m in candidates])
 
     return play

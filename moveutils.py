@@ -7,16 +7,16 @@ def encode_precise(board: c.Board, move: c.Move) -> str:
     s += c.square_name(move.from_square)
 
     if board.is_en_passant(move):
-        s += "x" + c.piece_name(c.PAWN)
+        s += "x" + c.Piece(c.PAWN, c.BLACK).symbol()
     elif board.is_capture(move):
-        s += "x" + c.piece_name(board.piece_type_at(move.to_square))
+        s += "x" + board.piece_at(move.to_square).symbol()
 
     s += c.square_name(move.to_square)
 
     if move.promotion is not None:
         s += "=" + c.piece_symbol(move.promotion)
 
-    return s
+    return s.lower()
 
 def matches(precise_move: str, candidate: str) -> bool:
     p, c = 0, 0

@@ -5,11 +5,11 @@ import time
 
 import chess
 
-white = player.player_stockfish()
+white = player.player_stockfish(skill=0)
 black = player.player_random()
 
+so = SquareOff()
 try:
-    so = SquareOff()
     so.start_game()
 
     board = chess.Board()
