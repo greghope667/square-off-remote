@@ -6,12 +6,30 @@ import time
 import chess
 import chess.pgn
 
-white = player.player_stockfish(skill=0)
-black = player.player_random()
-
 so = SquareOff()
+
+## Some games - change comments to set mode
+
+# Player (board input) versus stockfish
+white = so.start_game(player=chess.WHITE)
+black = player.player_stockfish(skill=0)
+
+## Stockfish versus random
+#so.start_game()
+#white = player.player_stockfish(skill=0)
+#black = player.player_random()
+
+## Stockfish vs player (text input)
+#so.start_game()
+#white = player.player_stockfish(skill=0)
+#black = player.player_cli()
+
+## Player (voice) vs random
+#so.start_game()
+#white = player.player_voice()
+#black = player.player_random()
+
 try:
-    so.start_game()
     game = chess.pgn.Game()
     node = game
 
