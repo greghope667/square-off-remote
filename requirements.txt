@@ -1,3 +1,5 @@
 bleak
 chess
 pocketsphinx
+berserk
+simple-term-menu
