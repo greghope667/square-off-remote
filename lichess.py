@@ -63,7 +63,9 @@ def main():
                         game = chess.pgn.read_game(pgn)
                         games_list.append(game)
                     games_menu_title = "Round Games"
-                    games_menu_items = ["[" + g.headers["Event"] + "]" + " -- " 
+                    games_menu_items = ["[" + g.headers["Event"] + " " 
+                                        + g.headers["White"] + " vs " 
+                                        + g.headers["Black"] + "]" + " -- " 
                                         + g.headers["Result"] for g in games_list]
                     games_menu_back = False
                     games_menu = TerminalMenu(
